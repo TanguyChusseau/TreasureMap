@@ -1,15 +1,20 @@
 # TreasureMap
 [Cloner le repo Git]
 [Avoir Maven (version r�cente) install� sur votre machine]
-[Avoir une version r�cente (12 ou ult�rieure) de Java install�e sur votre machine
+[Avoir une version r�cente (12 ou ult�rieure) de Java install�e sur votre machine]
+Se rendre via un terminal ou l'invité de commande Windows à la racine du projet, et entrer la commande :
+- mvn clean install
+
+Puis, afin de lancer le programme, entrer la commande :
+- mvn run
 
 Si vous souhaitez modifier le fichier en entrée, allez dans :
-src/main/java/carbon/exercise/trasuremap/service/InputFileReaderService, puis :
+src/main/java/fr/carbon/treasuremap/service/InputFileReaderService, puis :
 - modifier la constante inputFileLocation afin de choisir le répertoire contenant votre fichier,
 - modifier la constante inputFileName afin de sélectionner le nom de votre fichier.
 
 Si vous souhaitez modifier le fichier en sortie, allez dans :
-src/main/java/carbon/exercise/trasuremap/service/OutputFileReaderService, puis :
+src/main/java/fr/carbon/treasuremap/service/OutputFileReaderService, puis :
 - modifier la constante outputFileLocation afin de choisir le répertoire de destination pour le fichier,
 - modifier la constante outputFileName afin de sélectionner le nom de votre fichier.
 
