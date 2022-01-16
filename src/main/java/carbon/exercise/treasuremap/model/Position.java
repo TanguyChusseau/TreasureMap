@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Classe représentant la position sur la carte aux trésors {@link TreasureMap} d'un aventurier {@link Adventurer}
+ * Classe représentant la position sur la carte aux trésors {@link TreasureMapCell} d'un aventurier {@link Adventurer}
  * d'une montagne {@link Mountain} ou d'un trésor {@link Treasure}.
  */
 @AllArgsConstructor

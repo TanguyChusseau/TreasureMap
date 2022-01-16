@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public abstract class InputFileReaderService {
+public final class InputFileReaderService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InputFileReaderService.class);
     private static final String inputFileLocation = "src/main/resources/";

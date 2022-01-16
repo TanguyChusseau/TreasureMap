@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.util.List;
 
 /**
- * Classe représentant les aventuriers qui se déplaceront sur la carte aux trésors {@link TreasureMap}.
+ * Classe représentant les aventuriers qui se déplaceront sur la carte aux trésors {@link TreasureMapCell}.
  */
 @AllArgsConstructor
 @Getter

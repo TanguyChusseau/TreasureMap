@@ -6,7 +6,7 @@ import lombok.Setter;
 
 /**
  * Classe représentant les trésors qui seront éventuellement récupérés par un aventurier {@link Adventurer} lors de ses
- * déplacements sur la carte aux trésors {@link TreasureMap}.
+ * déplacements sur la carte aux trésors {@link TreasureMapCell}.
  */
 @AllArgsConstructor
 @Getter
