@@ -4,10 +4,12 @@ import fr.carbon.treasuremap.exception.ParseLineException;
 import fr.carbon.treasuremap.exception.ParseMountainLineException;
 import fr.carbon.treasuremap.model.Mountain;
 import fr.carbon.treasuremap.model.Position;
+import org.springframework.stereotype.Service;
 
 import static fr.carbon.treasuremap.utils.TreasureMapGameUtils.checkPositionFromInputFileType;
 import static fr.carbon.treasuremap.utils.TreasureMapGameUtils.splitLine;
 
+@Service
 public class MountainService {
 
     /**
@@ -17,9 +19,9 @@ public class MountainService {
      * @return la montagne construite.
      * @throws ParseMountainLineException en cas d'erreur de lecture des informations de la montagne dans le fichier.
      */
-    protected static Mountain createMountainFromInputFileLine(String line) throws ParseMountainLineException {
+    protected Mountain createMountainFromInputFileLine(String line) throws ParseMountainLineException {
         String[] mountainInformations = splitLine(line);
-        if (mountainInformations.length != 3) {
+        if (mountainInformations.length < 3) {
             throw new ParseMountainLineException("Error parsing mountain informations.");
         }
 

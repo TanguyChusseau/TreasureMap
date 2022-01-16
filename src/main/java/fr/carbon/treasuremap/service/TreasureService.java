@@ -4,9 +4,11 @@ import fr.carbon.treasuremap.exception.ParseTreasureLineException;
 import fr.carbon.treasuremap.model.Position;
 import fr.carbon.treasuremap.model.Treasure;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.stereotype.Service;
 
 import static fr.carbon.treasuremap.utils.TreasureMapGameUtils.splitLine;
 
+@Service
 public class TreasureService {
 
     /**
@@ -16,9 +18,9 @@ public class TreasureService {
      * @return le trésor construit.
      * @throws ParseTreasureLineException en cas d'erreur de lecture des informations du trésor dans le fichier.
      */
-    protected static Treasure createTreasureFromInputFileLine(String line) throws ParseTreasureLineException {
+    protected Treasure createTreasureFromInputFileLine(String line) throws ParseTreasureLineException {
         String[] treasureDetails = splitLine(line);
-        if (treasureDetails.length != 4) {
+        if (treasureDetails.length < 4) {
             throw new ParseTreasureLineException("Les informations du trésor sont incomplètes.");
         }
 

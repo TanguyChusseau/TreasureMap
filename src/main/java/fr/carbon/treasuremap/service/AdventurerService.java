@@ -3,15 +3,16 @@ package fr.carbon.treasuremap.service;
 import fr.carbon.treasuremap.exception.ParseAdventurerLineException;
 import fr.carbon.treasuremap.exception.ParseLineException;
 import fr.carbon.treasuremap.model.*;
-import fr.carbon.treasuremap.utils.TreasureMapGameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static fr.carbon.treasuremap.utils.TreasureMapGameUtils.*;
 
+@Service
 public class AdventurerService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AdventurerService.class);
@@ -23,9 +24,9 @@ public class AdventurerService {
      * @return l'aventurier construit.
      * @throws ParseAdventurerLineException en cas d'erreur de lecture des informations de l'aventurier dans le fichier.
      */
-    protected static Adventurer createAdventurerFromInputFileLine(String line) throws ParseAdventurerLineException {
+    protected Adventurer createAdventurerFromInputFileLine(String line) throws ParseAdventurerLineException {
         String[] adventurerDetails = splitLine(line);
-        if (adventurerDetails.length != 6) {
+        if (adventurerDetails.length < 6) {
             throw new ParseAdventurerLineException(ERROR_WHEN_READING_DETAILS +
                     "de l'aventurier : des informations sans manquantes.");
         }
@@ -54,17 +55,23 @@ public class AdventurerService {
      * @param treasureMap : la carte aux trésors {@link TreasureMap}.
      * @return la carte aux trésors mise à jour.
      */
-    public static TreasureMap processAdventurersMovementsOnTreasureMap(TreasureMap treasureMap) {
+    public  TreasureMap processAdventurersMovementsOnTreasureMap(TreasureMap treasureMap) {
         List<Adventurer> adventurers = getAdventurersFromTreasureMap(treasureMap);
         TreasureMapCell[][] treasureMapCells = treasureMap.getTreasureMapCells();
         for (Adventurer adventurer : adventurers) {
             for (Movement movement : adventurer.getMovements()) {
                 switch (movement) {
                     case FORWARD -> {
+                        Position currentPosition = adventurer.getPosition();
                         Position nextPosition = getNextAdventurerPosition(adventurer);
-                        logWhenNextPositionIsUnreachable(adventurer, nextPosition, movement, treasureMap);
+                        if (isNextPositionUnreachable(nextPosition, treasureMap)) {
+                            logWhenNextPositionIsUnreachable(adventurer, nextPosition, movement, treasureMap);
+                            break;
+                        }
+                        treasureMapCells[currentPosition.getHorizontalPosition()][nextPosition.getVerticalPosition()]
+                                .setAdventurer(null);
                         updateAdventurerPositionOnTreasureMap(treasureMap, adventurer, nextPosition);
-                        treasureMapCells[nextPosition.getVerticalPosition()][nextPosition.getHorizontalPosition()]
+                        treasureMapCells[nextPosition.getHorizontalPosition()][nextPosition.getVerticalPosition()]
                                 .setAdventurer(adventurer);
                     }
                     case TURN_RIGHT -> adventurer.setOrientation(getNextOrientationAfterRightTurn(adventurer.getOrientation()));
@@ -84,23 +91,26 @@ public class AdventurerService {
      * @param adventurer   : l'aventurier concerné.
      * @param nextPosition : la prochaine prosition de l'aventurier selon les éventuels obstacles.
      */
-    private static void updateAdventurerPositionOnTreasureMap(TreasureMap treasureMap,
+    private  void updateAdventurerPositionOnTreasureMap(TreasureMap treasureMap,
                                                               Adventurer adventurer,
                                                               Position nextPosition) {
+
         if (isNextPositionOnTreasure(nextPosition, treasureMap.getTreasureMapCells())) {
             Treasure treasure = treasureMap.getTreasureMapCells()[nextPosition.getVerticalPosition()]
                     [nextPosition.getHorizontalPosition()].getTreasure();
             treasure.setCount(treasure.getCount() - 1);
             adventurer.setCollectedTreasuresCount(adventurer.getCollectedTreasuresCount() + 1);
         }
+
         adventurer.setPosition(isNextPositionOutOfBounds(nextPosition, treasureMap)
                 || isNextPositionOnMoutain(nextPosition, treasureMap.getTreasureMapCells())
+                || isNextPositionOnAdventurer(nextPosition, treasureMap.getTreasureMapCells())
                 ? adventurer.getPosition()
                 : nextPosition
         );
     }
 
-    private static List<Adventurer> getAdventurersFromTreasureMap(TreasureMap treasureMap) {
+    private  List<Adventurer> getAdventurersFromTreasureMap(TreasureMap treasureMap) {
         List<Adventurer> adventurers = new ArrayList<>();
         for (TreasureMapCell[] treasureMapCells : treasureMap.getTreasureMapCells()) {
             for (TreasureMapCell treasureMapCell : treasureMapCells) {
@@ -118,7 +128,7 @@ public class AdventurerService {
      * @return l'orientation {@link Orientation} de l'aventurier.
      * @throws ParseAdventurerLineException en cas d'erreur de lecture des informations de l'aventurier dans le fichier.
      */
-    private static Orientation getAdventurerOrientation(String adventurerOrientation)
+    private  Orientation getAdventurerOrientation(String adventurerOrientation)
             throws ParseAdventurerLineException {
         switch (adventurerOrientation) {
             case "N":
@@ -131,7 +141,7 @@ public class AdventurerService {
                 return Orientation.WEST;
         }
         throw new ParseAdventurerLineException(ERROR_WHEN_READING_DETAILS +
-                        "de l'aventurier : les orientations possibles sont N, S, E et W uniquement.");
+                "de l'aventurier : les orientations possibles sont N, S, E et W uniquement.");
     }
 
     /**
@@ -141,7 +151,7 @@ public class AdventurerService {
      * @return la liste des mouvements.
      * @throws ParseAdventurerLineException en cas d'erreur de lecture des informations de l'aventurier dans le fichier.
      */
-    private static List<Movement> getAdventurerMovements(char[] adventurerMovements)
+    private  List<Movement> getAdventurerMovements(char[] adventurerMovements)
             throws ParseAdventurerLineException {
         List<Movement> movements = new ArrayList<>();
         for (char movement : adventurerMovements) {
@@ -150,7 +160,7 @@ public class AdventurerService {
                 case 'D' -> movements.add(Movement.TURN_RIGHT);
                 case 'G' -> movements.add(Movement.TURN_LEFT);
                 default -> throw new ParseAdventurerLineException(ERROR_WHEN_READING_DETAILS +
-                                "de l'aventurier : les mouvements possibles sont A, D et G uniquement.");
+                        "de l'aventurier : les mouvements possibles sont A, D et G uniquement.");
             }
         }
         return movements;
@@ -163,7 +173,7 @@ public class AdventurerService {
      * @param adventurer : l'aventurier concerné.
      * @return : la prochaine position de l'aventurier
      */
-    private static Position getNextAdventurerPosition(Adventurer adventurer) {
+    private  Position getNextAdventurerPosition(Adventurer adventurer) {
         Position currentAdventurerPosition = adventurer.getPosition();
         Position nextPosition = new Position();
 
@@ -188,48 +198,39 @@ public class AdventurerService {
         return nextPosition;
     }
 
-    private static Orientation getNextOrientationAfterRightTurn(Orientation orientation) {
-        Orientation nextOrientation = orientation;
-        switch (orientation) {
-            case NORTH -> nextOrientation = Orientation.EAST;
-            case SOUTH -> nextOrientation = Orientation.WEST;
-            case EAST -> nextOrientation = Orientation.SOUTH;
-            case WEST -> nextOrientation = Orientation.NORTH;
-        }
-        return nextOrientation;
-    }
-
-    private static Orientation getNextOrientationAfterLeftTurn(Orientation orientation) {
-        Orientation nextOrientation = orientation;
-        switch (orientation) {
-            case NORTH -> nextOrientation = Orientation.WEST;
-            case SOUTH -> nextOrientation = Orientation.EAST;
-            case EAST -> nextOrientation = Orientation.NORTH;
-            case WEST -> nextOrientation = Orientation.SOUTH;
-        }
-        return nextOrientation;
-    }
-
-    private static boolean isNextPositionOutOfBounds(Position nextPosition, TreasureMap treasureMap) {
+    private  boolean isNextPositionOutOfBounds(Position nextPosition, TreasureMap treasureMap) {
         return nextPosition.getHorizontalPosition() >= treasureMap.getRowCount()
                 || nextPosition.getVerticalPosition() >= treasureMap.getColumnCount();
     }
 
-    private static boolean isNextPositionOnMoutain(Position nextPosition, TreasureMapCell[][] treasureMapCells) {
+    private  boolean isNextPositionOnMoutain(Position nextPosition, TreasureMapCell[][] treasureMapCells) {
         return treasureMapCells[nextPosition.getVerticalPosition()][nextPosition.getHorizontalPosition()]
                 .getMountain() != null;
     }
 
-    private static boolean isNextPositionOnTreasure(Position nextPosition, TreasureMapCell[][] treasureMapCells) {
+    private  boolean isNextPositionOnAdventurer(Position nextPosition, TreasureMapCell[][] treasureMapCells) {
+        return treasureMapCells[nextPosition.getVerticalPosition()][nextPosition.getHorizontalPosition()]
+                .getAdventurer() != null;
+    }
+
+    private  boolean isNextPositionOnTreasure(Position nextPosition, TreasureMapCell[][] treasureMapCells) {
         return treasureMapCells[nextPosition.getVerticalPosition()][nextPosition.getHorizontalPosition()]
                 .getTreasure() != null;
 
     }
 
-    private static void logWhenNextPositionIsUnreachable(Adventurer adventurer,
+    private  boolean isNextPositionUnreachable(Position position, TreasureMap treasureMap) {
+        return isNextPositionOutOfBounds(position, treasureMap)
+                || isNextPositionOnMoutain(position, treasureMap.getTreasureMapCells())
+                || isNextPositionOnTreasure(position, treasureMap.getTreasureMapCells())
+                || isNextPositionOnAdventurer(position, treasureMap.getTreasureMapCells());
+    }
+
+    private  void logWhenNextPositionIsUnreachable(Adventurer adventurer,
                                                          Position nextPosition,
                                                          Movement movement,
                                                          TreasureMap treasureMap) {
+
         if (isNextPositionOutOfBounds(nextPosition, treasureMap)) {
             LOGGER.warn("Hors limites. Le déplacement " + movement.getValue() + " de l'aventurier : "
                     + adventurer.getName() + " est ignoré."
@@ -240,5 +241,32 @@ public class AdventurerService {
                     ". Le déplacement " + movement.getValue() + "est ignoré."
             );
         }
+        if (isNextPositionOnAdventurer(nextPosition, treasureMap.getTreasureMapCells())) {
+            LOGGER.warn("Un autre aventurier bloque l'aventurier : " + adventurer.getName() +
+                    ". Le déplacement " + movement.getValue() + "est ignoré."
+            );
+        }
+    }
+
+    private  Orientation getNextOrientationAfterRightTurn(Orientation orientation) {
+        Orientation nextOrientation = orientation;
+        switch (orientation) {
+            case NORTH -> nextOrientation = Orientation.EAST;
+            case SOUTH -> nextOrientation = Orientation.WEST;
+            case EAST -> nextOrientation = Orientation.SOUTH;
+            case WEST -> nextOrientation = Orientation.NORTH;
+        }
+        return nextOrientation;
+    }
+
+    private  Orientation getNextOrientationAfterLeftTurn(Orientation orientation) {
+        Orientation nextOrientation = orientation;
+        switch (orientation) {
+            case NORTH -> nextOrientation = Orientation.WEST;
+            case SOUTH -> nextOrientation = Orientation.EAST;
+            case EAST -> nextOrientation = Orientation.NORTH;
+            case WEST -> nextOrientation = Orientation.SOUTH;
+        }
+        return nextOrientation;
     }
 }

@@ -15,15 +15,17 @@ import static fr.carbon.treasuremap.utils.TreasureMapGameUtils.*;
 public final class OutputFileWriterService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OutputFileWriterService.class);
-    private static final String outputFileLocation = "src/main/resources/";
-    private static final String outputFileName = "treasureMap.txt";
 
     /**
      * Construit le fichier de sortie en fin de jeu.
      *
-     * @param treasureMap : la matrice représentant la carte aux trésors {@link TreasureMap}.
+     * @param treasureMap        : la matrice représentant la carte aux trésors {@link TreasureMap}.
+     * @param outputFileLocation : emplacement du fichier de sortie désiré.
+     * @param outputFileName     : nom du fichier de sortie désiré.
      */
-    public static void writeTreasureMapLinesToOutputFile(TreasureMap treasureMap) {
+    public void writeTreasureMapLinesToOutputFile(TreasureMap treasureMap,
+                                                  String outputFileLocation,
+                                                  String outputFileName) {
         List<String> lines = new ArrayList<>();
         formatAndAddTreasureMapLine(treasureMap, lines);
 
@@ -52,7 +54,7 @@ public final class OutputFileWriterService {
         }
     }
 
-    private static void formatAndAddTreasureMapLine(TreasureMap treasureMap, List<String> stringList) {
+    private void formatAndAddTreasureMapLine(TreasureMap treasureMap, List<String> stringList) {
         stringList.add(TREASURE_MAP_LINE_CHAR
                 + LINE_DELIMITER
                 + treasureMap.getColumnCount()
@@ -61,7 +63,7 @@ public final class OutputFileWriterService {
         );
     }
 
-    private static void getTreasureMapContent(TreasureMap treasureMap, List<Mountain> mountains, List<Treasure> treasures, List<Adventurer> adventurers) {
+    private void getTreasureMapContent(TreasureMap treasureMap, List<Mountain> mountains, List<Treasure> treasures, List<Adventurer> adventurers) {
         for (TreasureMapCell[] treasureMapCells : treasureMap.getTreasureMapCells()) {
             for (TreasureMapCell treasureMapCell : treasureMapCells) {
                 Adventurer adventurer = treasureMapCell.getAdventurer();
@@ -78,7 +80,7 @@ public final class OutputFileWriterService {
         }
     }
 
-    private static void formatAndAddMountainLine(List<String> stringList, Mountain mountain) {
+    private void formatAndAddMountainLine(List<String> stringList, Mountain mountain) {
         stringList.add(MOUNTAIN_LINE_CHAR
                 + LINE_DELIMITER
                 + mountain.getPosition().getHorizontalPosition()
@@ -87,7 +89,7 @@ public final class OutputFileWriterService {
         );
     }
 
-    private static void formatAndAddTreasureLine(List<String> stringList, Treasure treasure) {
+    private void formatAndAddTreasureLine(List<String> stringList, Treasure treasure) {
         stringList.add(TREASURE_LINE_CHAR
                 + LINE_DELIMITER
                 + treasure.getPosition().getHorizontalPosition()
@@ -98,7 +100,7 @@ public final class OutputFileWriterService {
         );
     }
 
-    private static void formatAndAddAdventurerLine(List<String> stringList, Adventurer adventurer) {
+    private void formatAndAddAdventurerLine(List<String> stringList, Adventurer adventurer) {
         stringList.add(ADVENTURER_LINE_CHAR
                 + LINE_DELIMITER
                 + adventurer.getName()

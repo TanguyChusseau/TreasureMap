@@ -1,55 +1,55 @@
 # TreasureMap
-[Cloner le repo Git]
-[Avoir Maven (version r�cente) install� sur votre machine]
-[Avoir une version r�cente (12 ou ult�rieure) de Java install�e sur votre machine]
-Se rendre via un terminal ou l'invité de commande Windows à la racine du projet, et entrer la commande :
-- mvn clean install
+-> [Cloner le repo Git]
+-> [Avoir Maven (version récente) installée sur votre machine]
+-> [Avoir une version récente (12 ou ultérieure) de Java installée sur votre machine]
 
-Puis, afin de lancer le programme, entrer la commande :
-- mvn run
+-> Se rendre via un terminal ou l'invité de commande Windows à la racine du projet, et entrer la commande :
+mvn clean install
 
-Si vous souhaitez modifier le fichier en entrée, allez dans :
-src/main/java/fr/carbon/treasuremap/service/InputFileReaderService, puis :
+-> Puis, lancez le programme depuis votre IDE en lançant le serveur Tomcat embarqué de Spring Boot sur la classe src/java/fr/carbon/treasuremap/TreasureMapApplication.java.
+
+-> Si vous souhaitez modifier le fichier en entrée, allez dans :
+src/main/java/fr/carbon/treasuremap/TreasureMapApplication, puis :
 - modifier la constante inputFileLocation afin de choisir le répertoire contenant votre fichier,
 - modifier la constante inputFileName afin de sélectionner le nom de votre fichier.
 
-Si vous souhaitez modifier le fichier en sortie, allez dans :
-src/main/java/fr/carbon/treasuremap/service/OutputFileReaderService, puis :
+-> Si vous souhaitez modifier le fichier en sortie, allez dans :
+src/main/java/fr/carbon/treasuremap/TreasureMapApplication, puis :
 - modifier la constante outputFileLocation afin de choisir le répertoire de destination pour le fichier,
 - modifier la constante outputFileName afin de sélectionner le nom de votre fichier.
 
 
-Exercice pratique - La carte aux tr�sors
-Guidez les aventuriers en qu�te de tr�sors !
+Exercice pratique - La carte aux trésors
+Guidez les aventuriers en quête de trésors !
 
 Contexte
-Le gouvernement p�ruvien vient d�autoriser les aventuriers en qu�te de tr�sors � explorer les 85 182
-km� du d�partement de la Madre de Dios. Vous devez r�aliser un syst�me permettant de suivre les
-d�placements et les collectes de tr�sors effectu�es par les aventuriers. Le gouvernement p�ruvien
-�tant tr�s � cheval sur les bonnes pratiques de code, il est important de r�aliser un code de qualit�,
-lisible, et maintenable (oui, �a veut dire avec des tests) !
+Le gouvernement péruvien vient d'autoriser les aventuriers en quête de trésors à explorer les 85 182
+kms du département de la Madre de Dios. Vous devez réaliser un système permettant de suivre les
+déplacements et les collectes de trésors effectuées par les aventuriers. Le gouvernement péruvien
+étant très à cheval sur les bonnes pratiques de code, il est important de réaliser un code de qualité,
+lisible, et maintenable (oui, ça veut dire avec des tests) !
 
-Donn�es du probl�me
+Données du problème
 
 La carte
-La carte de la Madre de Dios est de forme rectangulaire, chaque case ayant la m�me taille. On y
-trouve des plaines, des montagnes et des tr�sors.
-Les dimensions de la carte sont d�finies dans le fichier d�entr�e de l�exercice par la ligne suivante :
+La carte de la Madre de Dios est de forme rectangulaire, chaque case ayant la même taille. On y
+trouve des plaines, des montagnes et des trésors.
+Les dimensions de la carte sont définies dans le fichier d'entrée de l'exercice par la ligne suivante :
 # {C comme Carte} - {Nb. de case en largeur} - {Nb. de case en hauteur}
 C - 3 - 4
-Par d�faut, toutes les cases de la carte sont des plaines que les aventuriers peuvent traverser sans
-encombre. Les cases sont num�rot�es d�ouest en est, de nord en sud, en commen�ant par z�ro.
+Par défaut, toutes les cases de la carte sont des plaines que les aventuriers peuvent traverser sans
+encombre. Les cases sont numérotées d'ouest en est, de nord en sud, en commençant par zéro.
 
 Les montagnes sont des obstacles infranchissables pour les aventuriers. Chaque montagne de la
-carte de la Madre de Dios est �galement indiqu�e dans le fichier d�entr�e de l�exercice par la ligne
+carte de la Madre de Dios est également indiquée dans le fichier d'entrée de l'exercice par la ligne
 suivante :
 # {M comme Montagne} - {Axe horizontal} - {Axe vertical}
 M - 1 - 1
 
-Enfin, le plus important pour les aventuriers, les tr�sors. Plusieurs tr�sors peuvent �tre pr�sents sur
-une m�me case; le nombre de tr�sors sur une m�me case est indiqu� dans le fichier d�entr�e de
-l�exercice par la ligne suivante :
-# {T comme Tr�sor} - {Axe horizontal} - {Axe vertical} - {Nb. de tr�sors}
+Enfin, le plus important pour les aventuriers, les trésors. Plusieurs trésors peuvent être présents sur
+une même case; le nombre de trésors sur une même case est indiqué dans le fichier d'entrée de
+l'exercice par la ligne suivante :
+# {T comme Trésor} - {Axe horizontal} - {Axe vertical} - {Nb. de trésors}
 T - 0 - 3 - 2
 
 Exemple pour une carte de 3 x 4 :
@@ -59,56 +59,56 @@ M - 2 - 2
 T - 0 - 3 - 2
 T - 1 - 3 - 1
 
-Que l�on peut repr�senter sous la forme suivante :
+Que l'on peut représenter sous la forme suivante :
 . . .
 . M .
 . . M
 T(2) T(1) .
 
 Les aventuriers
-Un aventurier est caract�ris� par sa position sur la carte et son orientation (nord, sud, ...). Il ne peut
-se d�placer que d�une case � la fois, dans la direction d�finie par son orientation. Ceci dit, il peut
-changer d�orientation en pivotant de 90� vers la droite ou la gauche. Il d�bute son parcours avec une
-orientation (Nord, Sud, Est, Ouest), et une s�quence de mouvements (Avancer, tourner � Gauche,
-tourner � Droite) pr�d�finies. Ils ne sont pas montagnards pour un sou, et ne peuvent donc pas
+Un aventurier est caractérisée par sa position sur la carte et son orientation (nord, sud, ...). Il ne peut
+se déplacer que d'une case à la fois, dans la direction définie par son orientation. Ceci dit, il peut
+changer d'orientation en pivotant de 90° vers la droite ou la gauche. Il débute son parcours avec une
+orientation (Nord, Sud, Est, Ouest), et une séquence de mouvements (Avancer, tourner à Gauche,
+tourner à Droite) prédéfinies. Ils ne sont pas montagnards pour un sou, et ne peuvent donc pas
 traverser une case montagne.
-Exemple de s�quence de mouvement :
-AGGADADA deviendra : avancer, tourner � gauche, tourner � gauche, avancer, tourner � droite,
-avancer, tourner � droite, avancer.
-Les aventuriers pr�sents sur la carte sont indiqu�s dans le fichier d�entr�e de l�exercice sous la forme
+
+Exemple de séquence de mouvement :
+AGGADADA deviendra : avancer, tourner à gauche, tourner à gauche, avancer, tourner à droite,
+avancer, tourner à droite, avancer.
+Les aventuriers présents sur la carte sont indiqués dans le fichier d'entrée de l'exercice sous la forme
 suivante :
-# {A comme Aventurier} - {Nom de l�aventurier} - {Axe horizontal} - {Axe
-vertical} - {Orientation} - {S�quence de mouvement}
+# {A comme Aventurier} - {Nom de l'aventurier} - {Axe horizontal} - {Axe vertical} - {Orientation} - {Séquence de mouvement}
 A - Indiana - 1 - 1 - S - AADADA
 
 Exemple pour une carte de 3 x 4 :
-Au d�part :
+Au départ :
 . . .
 . A .
 M . .
 . . .
 
-A l�arriv�e, �tape indiqu�e entre parenth�ses :
+A l'arrivée, étape indiquée entre parenthèses :
 . . .
 . . .
 M (1) .
 A (2) .
 
-On remarquera que l�aventurier reste bloqu� en orientation Nord, � cause de la montagne. Dans ce
-cas pr�cis, l�aventurier ignore les mouvements bloquants et poursuit l�ex�cution de la s�quence.
-Si l�aventurier passe par dessus une case Tr�sor, il ramasse un tr�sor pr�sent sur la case. Si la case
-contient 2 tr�sors, l�aventurier devra quitter la case puis revenir sur celle-ci afin de ramasser le 2�me
-tr�sor.
+On remarquera que l'aventurier reste bloqué en orientation Nord, à cause de la montagne. Dans ce
+cas précis, l'aventurier ignore les mouvements bloquants et poursuit l'exécution de la séquence.
+Si l'aventurier passe par-dessus une case Trésor, il ramasse un trésor présent sur la case. Si la case
+contient 2 trésors, l'aventurier devra quitter la case puis revenir sur celle-ci afin de ramasser le 2ème
+trésor.
 
-Il ne peut y avoir qu�un aventurier � la fois sur une m�me case. Les mouvements des aventuriers sont
-�valu�s tour par tour. En cas de conflit entre mouvements sur un m�me tour, c�est l�ordre d�apparition
-de l�aventurier dans le fichier qui donne la priorit� des mouvements.
+Il ne peut y avoir qu'un aventurier à la fois sur une même case. Les mouvements des aventuriers sont
+évalués tour par tour. En cas de conflit entre mouvements sur un même tour, c'est l'ordre d'apparition
+de l'aventurier dans le fichier qui donne la priorité des mouvements.
 
-Ce qu�il faut r�aliser
+Ce qu'il faut réaliser
 
-Lire le fichier d�entr�e
-Le programme doit �tre capable de lire le fichier d�entr�e de l�exercice.
-Note : une ligne d�butant par un �#� est un commentaire et doit �tre ignor�e.
+Lire le fichier d'entrée
+Le programme doit être capable de lire le fichier d'entrée de l'exercice.
+Note : une ligne débutant par un '#' est un commentaire et doit être ignorée.
 
 Exemple :
 C - 3 - 4
@@ -117,34 +117,33 @@ M - 2 - 1
 T - 0 - 3 - 2
 T - 1 - 3 - 3
 A - Lara - 1 - 1 - S - AADADAGGA
-Que l�on peut repr�senter sous la forme suivante :
+
+Que l'on peut représenter sous la forme suivante :
 . M .
 . A(Lara) M
 . . .
 T(2) T(3) .
 
 Simuler les mouvements des aventuriers
-Le programme doit �tre capable d�ex�cuter les mouvements des diff�rents aventuriers en respectant
-les contraintes de l�exercice, de g�rer la collecte des tr�sors et de restituer le r�sultat final de la
+Le programme doit être capable déexécuter les mouvements des différents aventuriers en respectant
+les contraintes de l'exercice, de gérer la collecte des trésors et de restituer le résultat final de la
 simulation.
-Dans l�exemple pr�c�dent, Lara collecte 3 tr�sors et finit son parcours en (0 - 3).
+Dans l'exemple précédent, Lara collecte 3 trésors et finit son parcours en (0 - 3).
 
 Ecrire le fichier de sortie
-Le programme doit �tre capable d��crire un fichier contenant le r�sultat final de la simulation.
-Note : une ligne d�butant par un �#� est un commentaire et doit �tre ignor�e.
+Le programme doit être capable d'écrire un fichier contenant le résultat final de la simulation.
+Note : une ligne débutant par un '#' est un commentaire et doit être ignorée.
 
 Voici le format de sortie :
 C - 3 - 4
 M - 1 - 0
 M - 2 - 1
-# {T comme Tr�sor} - {Axe horizontal} - {Axe vertical} - {Nb. de tr�sors
-restants}
+# {T comme Trésor} - {Axe horizontal} - {Axe vertical} - {Nb. de trésors restants}
 T - 1 - 3 - 2
-# {A comme Aventurier} - {Nom de l�aventurier} - {Axe horizontal} - {Axe
-vertical} - {Orientation} - {Nb. tr�sors ramass�s}
+# {A comme Aventurier} - {Nom de l�aventurier} - {Axe horizontal} - {Axe vertical} - {Orientation} - {Nb. trésors ramassés}
 A - Lara - 0 - 3 - S - 3
 
-Que l�on peut repr�senter sous la forme suivante :
+Que l'on peut représenter sous la forme suivante :
 . M .
 . . M
 . . .

@@ -18,6 +18,27 @@ public class TreasureMapApplication implements CommandLineRunner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TreasureMapApplication.class);
 
+    private static final String inputFileLocation = "src/main/resources/";
+    private static final String inputFileName = "data.txt";
+    private static final String outputFileLocation = "src/main/resources/";
+    private static final String outputFileName = "treasureMap.txt";
+
+    private final AdventurerService adventurerService;
+    private final InputFileReaderService inputFileReaderService;
+    private final TreasureMapService treasureMapService;
+    private final OutputFileWriterService outputFileWriterService;
+
+    public TreasureMapApplication(AdventurerService adventurerService,
+                                  InputFileReaderService inputFileReaderService,
+                                  TreasureMapService treasureMapService,
+                                  OutputFileWriterService outputFileWriterService) {
+
+        this.adventurerService = adventurerService;
+        this.inputFileReaderService = inputFileReaderService;
+        this.treasureMapService = treasureMapService;
+        this.outputFileWriterService = outputFileWriterService;
+    }
+
     public static void main(String[] args) {
         LOGGER.info("****** DEMARRAGE DU JEU  : LA CARTE AUX TRESORS ******");
         SpringApplication.run(TreasureMapApplication.class, args);
@@ -26,9 +47,9 @@ public class TreasureMapApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        List<String> inputFileLines = InputFileReaderService.getInputFileLines();
-        TreasureMap treasureMap = TreasureMapService.createTreasureMapFromInputFile(inputFileLines);
-        AdventurerService.processAdventurersMovementsOnTreasureMap(treasureMap);
-        OutputFileWriterService.writeTreasureMapLinesToOutputFile(treasureMap);
+        List<String> inputFileLines = inputFileReaderService.getInputFileLines(inputFileLocation, inputFileName);
+        TreasureMap initialTreasureMap = treasureMapService.createTreasureMapFromInputFile(inputFileLines);
+        TreasureMap updateTreasureMap = adventurerService.processAdventurersMovementsOnTreasureMap(initialTreasureMap);
+        outputFileWriterService.writeTreasureMapLinesToOutputFile(updateTreasureMap, outputFileLocation, outputFileName);
     }
 }
