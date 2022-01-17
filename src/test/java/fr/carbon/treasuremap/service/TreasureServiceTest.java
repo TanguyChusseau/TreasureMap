@@ -28,7 +28,7 @@ public class TreasureServiceTest {
     }
 
     @Test
-    public void should_throw_when_not_enough_treasure_details_from__input_file() {
+    public void should_throw_when_not_enough_treasure_details_from_line() {
         //Given
         String line = "T - 1 -";
 
@@ -39,7 +39,7 @@ public class TreasureServiceTest {
     }
 
     @Test
-    public void should_throw_when_treasure_position_not_numeric() {
+    public void should_throw_when_treasure_position_is_not_numeric() {
         //Given
         String treasureLineTest = "T - T - 0";
 
@@ -50,7 +50,7 @@ public class TreasureServiceTest {
     }
 
     @Test
-    public void should_throw_when_treasure_count_not_numeric() {
+    public void should_throw_when_treasure_count_is_not_numeric() {
         //Given
         String treasureLineTest = "T - 1 - 0 - E";
 

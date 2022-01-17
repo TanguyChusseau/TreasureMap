@@ -24,7 +24,7 @@ public class InputFileReaderService {
                     .filter(line -> !line.startsWith("#"))
                     .toList();
         } catch (IOException e) {
-            throw new ParseLineException("Une erreur est survenue lors de la lecture du fichier : ");
+            throw new ParseLineException("Une erreur est survenue lors de la lecture du fichier : " + e.getMessage());
         }
 
         if (inputFileLines.size() == 0) {

@@ -43,12 +43,16 @@ public class TreasureMapService {
         TreasureMap treasureMap = getTreasureMapDetailsFromInputFileLine(inputFileLines.get(0));
         TreasureMapCell[][] treasureMapCells = treasureMap.getTreasureMapCells();
 
+        int apparitionOrder = 1;
         for (String line : inputFileLines.stream().skip(1).toList()) {
             char treasureMapObject = line.toUpperCase().charAt(0);
             switch (treasureMapObject) {
                 case MOUNTAIN_LINE_CHAR -> putMountainOnTreasureMapCell(line, treasureMap, treasureMapCells);
                 case TREASURE_LINE_CHAR -> putTreasureOnTreasureMapCell(line, treasureMap, treasureMapCells);
-                case ADVENTURER_LINE_CHAR -> putAdventurerOnTreasureMapCell(line, treasureMap, treasureMapCells);
+                case ADVENTURER_LINE_CHAR -> {
+                    putAdventurerOnTreasureMapCell(line, treasureMap, treasureMapCells, apparitionOrder);
+                    apparitionOrder++;
+                }
                 default -> throw new ParseLineException("Erreur lors du remplissage de la carte aux trésors : " +
                         "chaque ligne du fichier en entrée après la première doit commencer par la lettre A, M, ou T."
                 );
@@ -79,31 +83,13 @@ public class TreasureMapService {
             throw new ParseTreasureMapLineException(ple.getMessage());
         }
 
-        TreasureMapCell[][] treasureMapCells =
-                setupTreasureMapMatrix(Integer.parseInt(columnCount), Integer.parseInt(rowCount));
-
-        return new TreasureMap(Integer.parseInt(columnCount), Integer.parseInt(rowCount), treasureMapCells);
+        return new TreasureMap(Integer.parseInt(columnCount), Integer.parseInt(rowCount));
     }
 
-    /**
-     * Créé la matrice de {@link TreasureMapCell} représentant la carte aux trésors {@link TreasureMap}.
-     *
-     * @param columnCount : le nombre de colonnes.
-     * @param rowCount    : le nombre de lignes.
-     * @return : la matrice construite (array à deux dimensions).
-     */
-    private TreasureMapCell[][] setupTreasureMapMatrix(int columnCount, int rowCount) {
-        TreasureMapCell[][] treasureMapMatrix = new TreasureMapCell[columnCount][rowCount];
-        for (int i = 0; i < columnCount; i++) {
-            for (int j = 0; j < rowCount; j++) {
-                treasureMapMatrix[i][j] = new TreasureMapCell();
-            }
-        }
-        return treasureMapMatrix;
-    }
-
-    protected boolean isPositionOutOfBounds(Position position, TreasureMap treasureMap) {
-        return position.getHorizontalPosition() >= treasureMap.getColumnCount()
+    protected boolean isPositionNegativeOrOutOfBounds(Position position, TreasureMap treasureMap) {
+        return position.getHorizontalPosition() < 0
+                || position.getHorizontalPosition() >= treasureMap.getColumnCount()
+                || position.getVerticalPosition() < 0
                 || position.getVerticalPosition() >= treasureMap.getRowCount();
     }
 
@@ -123,15 +109,15 @@ public class TreasureMapService {
                 || treasureMapCells[position.getHorizontalPosition()][position.getVerticalPosition()].getAdventurer() != null;
     }
 
-    private void logWhenPositionIsOutOfBounds(Position position,
-                                              TreasureMap treasureMap,
-                                              String objectToAdd) {
-        if (isPositionOutOfBounds(position, treasureMap)) {
+    private void logWhenPositionIsNegativeOrOutOfBounds(Position position,
+                                                        TreasureMap treasureMap,
+                                                        String objectToAdd) {
+        if (isPositionNegativeOrOutOfBounds(position, treasureMap)) {
             LOGGER.warn("L'emplacement ("
                     + position.getHorizontalPosition()
                     + ","
                     + position.getVerticalPosition()
-                    + ")est hors limites de la carte. L'ajout de l'objet "
+                    + ") est hors limites de la carte ou de valeur négative. L'ajout de l'objet "
                     + objectToAdd
                     + " à cette position est donc ignoré."
             );
@@ -165,9 +151,10 @@ public class TreasureMapService {
             throws ParseMountainLineException {
         Mountain mountain = mountainService.createMountainFromInputFileLine(line);
         if (mountain == null) return;
+
         Position mountainPosition = mountain.getPosition();
-        if (isPositionOutOfBounds(mountainPosition, treasureMap)) {
-            logWhenPositionIsOutOfBounds(mountainPosition, treasureMap, "Montagne");
+        if (isPositionNegativeOrOutOfBounds(mountainPosition, treasureMap)) {
+            logWhenPositionIsNegativeOrOutOfBounds(mountainPosition, treasureMap, "Montagne");
             return;
         }
         if (isPositionNullOrEmptyTakenOnTreasureMap(mountainPosition, treasureMapCells)) {
@@ -195,9 +182,10 @@ public class TreasureMapService {
                                                 TreasureMapCell[][] treasureMapCells) throws ParseTreasureLineException {
         Treasure treasure = treasureService.createTreasureFromInputFileLine(line);
         if (treasure == null) return;
+
         Position treasurePosition = treasure.getPosition();
-        if (isPositionOutOfBounds(treasurePosition, treasureMap)) {
-            logWhenPositionIsOutOfBounds(treasurePosition, treasureMap, "Trésor");
+        if (isPositionNegativeOrOutOfBounds(treasurePosition, treasureMap)) {
+            logWhenPositionIsNegativeOrOutOfBounds(treasurePosition, treasureMap, "Trésor");
             return;
         }
         if (isPositionNullOrEmptyTakenOnTreasureMap(treasurePosition, treasureMapCells)) {
@@ -218,17 +206,20 @@ public class TreasureMapService {
      * @param line             ligne du fichier en entrée contenant les informations de l'aventurier.
      * @param treasureMap      : la carte aux trésors.
      * @param treasureMapCells : matrice de {@link TreasureMapCell} représentant la carte aux trésors.
+     * @param apparitionOrder  : ordre d'apparition de l'aventurier dans le fichier en entrée.
      * @throws ParseAdventurerLineException en cas d'erreur de lecture des informations.
      */
     protected void putAdventurerOnTreasureMapCell(String line,
                                                   TreasureMap treasureMap,
-                                                  TreasureMapCell[][] treasureMapCells)
+                                                  TreasureMapCell[][] treasureMapCells,
+                                                  int apparitionOrder)
             throws ParseAdventurerLineException {
         Adventurer adventurer = adventurerService.createAdventurerFromInputFileLine(line);
         if (adventurer == null) return;
+
         Position adventurerPosition = adventurer.getPosition();
-        if (isPositionOutOfBounds(adventurerPosition, treasureMap)) {
-            logWhenPositionIsOutOfBounds(adventurerPosition, treasureMap, "Montagne");
+        if (isPositionNegativeOrOutOfBounds(adventurerPosition, treasureMap)) {
+            logWhenPositionIsNegativeOrOutOfBounds(adventurerPosition, treasureMap, "Montagne");
             return;
         }
         if (isPositionNullOrEmptyTakenOnTreasureMap(adventurerPosition, treasureMapCells)) {
@@ -237,6 +228,7 @@ public class TreasureMapService {
         }
 
         TreasureMapCell treasureMapCell = new TreasureMapCell();
+        adventurer.setApparitionOrder(apparitionOrder);
         treasureMapCell.setAdventurer(adventurer);
 
         treasureMapCells[adventurerPosition.getHorizontalPosition()][adventurerPosition.getVerticalPosition()]

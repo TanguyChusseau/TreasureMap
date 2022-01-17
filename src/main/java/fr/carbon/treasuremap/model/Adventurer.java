@@ -19,4 +19,5 @@ public class Adventurer {
     private Orientation orientation;
     private List<Movement> movements;
     private int collectedTreasuresCount;
+    private int apparitionOrder;
 }

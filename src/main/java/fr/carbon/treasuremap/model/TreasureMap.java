@@ -15,9 +15,26 @@ public class TreasureMap {
     private int rowCount;
     private TreasureMapCell[][] treasureMapCells;
 
-    public TreasureMap(int columnCount, int rowCount, TreasureMapCell[][] treasureMapCells) {
+    public TreasureMap(int columnCount, int rowCount) {
         this.columnCount = columnCount;
         this.rowCount = rowCount;
-        this.treasureMapCells = treasureMapCells;
+        this.treasureMapCells = setupTreasureMapMatrix(this.columnCount, this.rowCount);
+    }
+
+    /**
+     * Créé la matrice de {@link TreasureMapCell} représentant la carte aux trésors.
+     *
+     * @param columnCount : le nombre de colonnes.
+     * @param rowCount    : le nombre de lignes.
+     * @return : la matrice construite (array à deux dimensions).
+     */
+    private TreasureMapCell[][] setupTreasureMapMatrix(int columnCount, int rowCount) {
+        TreasureMapCell[][] treasureMapMatrix = new TreasureMapCell[columnCount][rowCount];
+        for (int i = 0; i < columnCount; i++) {
+            for (int j = 0; j < rowCount; j++) {
+                treasureMapMatrix[i][j] = new TreasureMapCell();
+            }
+        }
+        return treasureMapMatrix;
     }
 }

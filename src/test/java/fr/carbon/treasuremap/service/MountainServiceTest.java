@@ -24,7 +24,7 @@ public class MountainServiceTest {
     }
 
     @Test
-    public void should_throw_when_not_enough_mountain_details_from__input_file() {
+    public void should_throw_when_not_enough_mountain_details_from_line() {
         //Given
         String mountainLineTest = "M - 1 -";
 
@@ -35,7 +35,7 @@ public class MountainServiceTest {
     }
 
     @Test
-    public void should_throw_when_mountain_position_not_numeric() {
+    public void should_throw_when_mountain_position_is_not_numeric() {
         //Given
         String mountainLineTest = "M - T - 0";
 

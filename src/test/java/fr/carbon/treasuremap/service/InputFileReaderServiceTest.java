@@ -16,7 +16,7 @@ public class InputFileReaderServiceTest {
     private final InputFileReaderService inputFileReaderService = new InputFileReaderService();
 
     @Test
-    public void should_return_lines_when_reading_file() throws ParseLineException {
+    public void should_return_lines_when_reading_input_file() throws ParseLineException {
         //Given
         String inputFileLocation = "src/test/resources/";
         String inputFileName = "inputFileTest.txt";
@@ -38,6 +38,19 @@ public class InputFileReaderServiceTest {
     }
 
     @Test
+    public void should_ignore_lines_starting_with_hashtag() throws ParseLineException {
+        //Given
+        String inputFileLocation = "src/test/resources/";
+        String inputFileName = "inputFileHashtagTest.txt";
+
+        //When
+        List<String> inputFileLines = inputFileReaderService.getInputFileLines(inputFileLocation, inputFileName);
+
+        //Then
+        assertEquals(0, inputFileLines.size());
+    }
+
+    @Test
     public void should_throw_when_file_not_found() {
         //Given
         String inputFileLocation = "src/test/resources/";
@@ -48,5 +61,4 @@ public class InputFileReaderServiceTest {
                 inputFileReaderService.getInputFileLines(inputFileLocation, inputFileName)
         );
     }
-
 }

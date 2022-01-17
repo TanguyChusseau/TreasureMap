@@ -1,8 +1,7 @@
 package fr.carbon.treasuremap.service;
 
+import fr.carbon.treasuremap.exception.ParseLineException;
 import fr.carbon.treasuremap.model.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -16,8 +15,6 @@ import static fr.carbon.treasuremap.utils.TreasureMapGameUtils.*;
 @Service
 public class OutputFileWriterService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OutputFileWriterService.class);
-
     /**
      * Construit le fichier de sortie en fin de jeu.
      *
@@ -27,7 +24,7 @@ public class OutputFileWriterService {
      */
     public void writeTreasureMapLinesToOutputFile(TreasureMap treasureMap,
                                                   String outputFileLocation,
-                                                  String outputFileName) {
+                                                  String outputFileName) throws ParseLineException {
         List<String> lines = new ArrayList<>();
         formatAndAddTreasureMapLine(treasureMap, lines);
 
@@ -36,29 +33,55 @@ public class OutputFileWriterService {
         List<Adventurer> adventurers = new ArrayList<>();
 
         getTreasureMapContent(treasureMap, mountains, treasures, adventurers);
-        System.out.println(adventurers);
 
         for (Mountain mountain : mountains) {
-            formatAndAddMountainLine(lines, mountain);
+            formatAndAddMountainLine(mountain, lines);
         }
         for (Treasure treasure : treasures) {
-            formatAndAddTreasureLine(lines, treasure);
+            formatAndAddTreasureLine(treasure, lines);
         }
         for (Adventurer adventurer : adventurers) {
-            formatAndAddAdventurerLine(lines, adventurer);
+            formatAndAddAdventurerLine(adventurer, lines);
         }
 
         try {
             Files.write(Paths.get(outputFileLocation + outputFileName), lines);
         } catch (IOException e) {
-            LOGGER.error("Une erreur est survenue lors de l'écriture des données dans le fichier de sortie : "
-                    + e.getMessage()
+            throw new ParseLineException(
+                    "Une erreur est survenue lors de l'écriture des données dans le fichier de sortie' du fichier : "
+                            + e.getMessage()
             );
         }
     }
 
-    private void formatAndAddTreasureMapLine(TreasureMap treasureMap, List<String> stringList) {
-        stringList.add(TREASURE_MAP_LINE_CHAR
+
+    protected void getTreasureMapContent(TreasureMap treasureMap,
+                                         List<Mountain> mountains,
+                                         List<Treasure> treasures,
+                                         List<Adventurer> adventurers) {
+
+        if (treasureMap == null || treasureMap.getTreasureMapCells() == null) return;
+        for (TreasureMapCell[] treasureMapCells : treasureMap.getTreasureMapCells()) {
+            for (TreasureMapCell treasureMapCell : treasureMapCells) {
+                if (treasureMapCell != null) {
+                    Mountain mountain = treasureMapCell.getMountain();
+                    Treasure treasure = treasureMapCell.getTreasure();
+                    Adventurer adventurer = treasureMapCell.getAdventurer();
+
+                    if (mountain != null) {
+                        mountains.add(mountain);
+                    } else if (treasure != null && treasure.getCount() >  0) {
+                        treasures.add(treasure);
+                    } else if (adventurer != null) {
+                        adventurers.add(adventurer);
+                    }
+                }
+            }
+        }
+    }
+
+    protected void formatAndAddTreasureMapLine(TreasureMap treasureMap, List<String> lines) {
+        lines.add(TREASURE_MAP_LINE_CHAR
                 + LINE_DELIMITER
                 + treasureMap.getColumnCount()
                 + LINE_DELIMITER
@@ -66,25 +89,8 @@ public class OutputFileWriterService {
         );
     }
 
-    private void getTreasureMapContent(TreasureMap treasureMap, List<Mountain> mountains, List<Treasure> treasures, List<Adventurer> adventurers) {
-        for (TreasureMapCell[] treasureMapCells : treasureMap.getTreasureMapCells()) {
-            for (TreasureMapCell treasureMapCell : treasureMapCells) {
-                Adventurer adventurer = treasureMapCell.getAdventurer();
-                Mountain mountain = treasureMapCell.getMountain();
-                Treasure treasure = treasureMapCell.getTreasure();
-                if (mountain != null) {
-                    mountains.add(mountain);
-                } else if (treasure != null) {
-                    treasures.add(treasure);
-                } else if (adventurer != null) {
-                    adventurers.add(adventurer);
-                }
-            }
-        }
-    }
-
-    private void formatAndAddMountainLine(List<String> stringList, Mountain mountain) {
-        stringList.add(MOUNTAIN_LINE_CHAR
+    protected void formatAndAddMountainLine(Mountain mountain, List<String> lines) {
+        lines.add(MOUNTAIN_LINE_CHAR
                 + LINE_DELIMITER
                 + mountain.getPosition().getHorizontalPosition()
                 + LINE_DELIMITER
@@ -92,8 +98,8 @@ public class OutputFileWriterService {
         );
     }
 
-    private void formatAndAddTreasureLine(List<String> stringList, Treasure treasure) {
-        stringList.add(TREASURE_LINE_CHAR
+    protected void formatAndAddTreasureLine(Treasure treasure, List<String> lines) {
+        lines.add(TREASURE_LINE_CHAR
                 + LINE_DELIMITER
                 + treasure.getPosition().getHorizontalPosition()
                 + LINE_DELIMITER
@@ -103,8 +109,8 @@ public class OutputFileWriterService {
         );
     }
 
-    private void formatAndAddAdventurerLine(List<String> stringList, Adventurer adventurer) {
-        stringList.add(ADVENTURER_LINE_CHAR
+    protected void formatAndAddAdventurerLine(Adventurer adventurer, List<String> lines) {
+        lines.add(ADVENTURER_LINE_CHAR
                 + LINE_DELIMITER
                 + adventurer.getName()
                 + LINE_DELIMITER

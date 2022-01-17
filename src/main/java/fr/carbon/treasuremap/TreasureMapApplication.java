@@ -49,7 +49,7 @@ public class TreasureMapApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
         List<String> inputFileLines = inputFileReaderService.getInputFileLines(inputFileLocation, inputFileName);
         TreasureMap initialTreasureMap = treasureMapService.createTreasureMapFromInputFile(inputFileLines);
-        TreasureMap updateTreasureMap = adventurerService.processAdventurersMovementsOnTreasureMap(initialTreasureMap);
+        TreasureMap updateTreasureMap = adventurerService.moveAdventurersOnTreasureMap(initialTreasureMap);
         outputFileWriterService.writeTreasureMapLinesToOutputFile(updateTreasureMap, outputFileLocation, outputFileName);
     }
 }
