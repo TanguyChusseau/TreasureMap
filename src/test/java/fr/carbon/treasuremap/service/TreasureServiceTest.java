@@ -10,13 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TreasureServiceTest {
 
-    private final TreasureService treasureService;
-    private final MountainService mountainService;
-
-    public TreasureServiceTest(TreasureService treasureService, MountainService mountainService) {
-        this.treasureService = treasureService;
-        this.mountainService = mountainService;
-    }
+    private final TreasureService treasureService = new TreasureService();
+    private final MountainService mountainService = new MountainService();
 
     @Test
     public void should_create_treasure_from_line() throws ParseTreasureLineException {

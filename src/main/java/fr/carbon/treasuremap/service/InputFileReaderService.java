@@ -3,6 +3,7 @@ package fr.carbon.treasuremap.service;
 import fr.carbon.treasuremap.exception.ParseLineException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,7 +11,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
-public final class InputFileReaderService {
+@Service
+public class InputFileReaderService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InputFileReaderService.class);
 

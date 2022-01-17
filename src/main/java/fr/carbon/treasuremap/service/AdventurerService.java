@@ -55,7 +55,7 @@ public class AdventurerService {
      * @param treasureMap : la carte aux trésors {@link TreasureMap}.
      * @return la carte aux trésors mise à jour.
      */
-    public  TreasureMap processAdventurersMovementsOnTreasureMap(TreasureMap treasureMap) {
+    public TreasureMap processAdventurersMovementsOnTreasureMap(TreasureMap treasureMap) {
         List<Adventurer> adventurers = getAdventurersFromTreasureMap(treasureMap);
         TreasureMapCell[][] treasureMapCells = treasureMap.getTreasureMapCells();
         for (Adventurer adventurer : adventurers) {
@@ -70,7 +70,7 @@ public class AdventurerService {
                         }
                         treasureMapCells[currentPosition.getHorizontalPosition()][nextPosition.getVerticalPosition()]
                                 .setAdventurer(null);
-                        updateAdventurerPositionOnTreasureMap(treasureMap, adventurer, nextPosition);
+                        updateAdventurerOnTreasureMap(treasureMap, adventurer, nextPosition);
                         treasureMapCells[nextPosition.getHorizontalPosition()][nextPosition.getVerticalPosition()]
                                 .setAdventurer(adventurer);
                     }
@@ -79,21 +79,19 @@ public class AdventurerService {
                 }
             }
         }
-        treasureMap.setTreasureMapCells(treasureMapCells);
         return treasureMap;
     }
 
     /**
-     * Met à jour la {@link Position} d'un {@link Adventurer} sur la carte aux trésors en fonction de son orientation
-     * actuelle (dans le cas d'un déplacement en avant).
+     * Met à jour un {@link Adventurer} sur la carte aux trésors.
      *
      * @param treasureMap  : la carte aux trésors {@link TreasureMap}.
      * @param adventurer   : l'aventurier concerné.
      * @param nextPosition : la prochaine prosition de l'aventurier selon les éventuels obstacles.
      */
-    private  void updateAdventurerPositionOnTreasureMap(TreasureMap treasureMap,
-                                                              Adventurer adventurer,
-                                                              Position nextPosition) {
+    private void updateAdventurerOnTreasureMap(TreasureMap treasureMap,
+                                               Adventurer adventurer,
+                                               Position nextPosition) {
 
         if (isNextPositionOnTreasure(nextPosition, treasureMap.getTreasureMapCells())) {
             Treasure treasure = treasureMap.getTreasureMapCells()[nextPosition.getVerticalPosition()]
@@ -101,16 +99,10 @@ public class AdventurerService {
             treasure.setCount(treasure.getCount() - 1);
             adventurer.setCollectedTreasuresCount(adventurer.getCollectedTreasuresCount() + 1);
         }
-
-        adventurer.setPosition(isNextPositionOutOfBounds(nextPosition, treasureMap)
-                || isNextPositionOnMoutain(nextPosition, treasureMap.getTreasureMapCells())
-                || isNextPositionOnAdventurer(nextPosition, treasureMap.getTreasureMapCells())
-                ? adventurer.getPosition()
-                : nextPosition
-        );
+        adventurer.setPosition(nextPosition);
     }
 
-    private  List<Adventurer> getAdventurersFromTreasureMap(TreasureMap treasureMap) {
+    private List<Adventurer> getAdventurersFromTreasureMap(TreasureMap treasureMap) {
         List<Adventurer> adventurers = new ArrayList<>();
         for (TreasureMapCell[] treasureMapCells : treasureMap.getTreasureMapCells()) {
             for (TreasureMapCell treasureMapCell : treasureMapCells) {
@@ -128,7 +120,7 @@ public class AdventurerService {
      * @return l'orientation {@link Orientation} de l'aventurier.
      * @throws ParseAdventurerLineException en cas d'erreur de lecture des informations de l'aventurier dans le fichier.
      */
-    private  Orientation getAdventurerOrientation(String adventurerOrientation)
+    private Orientation getAdventurerOrientation(String adventurerOrientation)
             throws ParseAdventurerLineException {
         switch (adventurerOrientation) {
             case "N":
@@ -151,7 +143,7 @@ public class AdventurerService {
      * @return la liste des mouvements.
      * @throws ParseAdventurerLineException en cas d'erreur de lecture des informations de l'aventurier dans le fichier.
      */
-    private  List<Movement> getAdventurerMovements(char[] adventurerMovements)
+    private List<Movement> getAdventurerMovements(char[] adventurerMovements)
             throws ParseAdventurerLineException {
         List<Movement> movements = new ArrayList<>();
         for (char movement : adventurerMovements) {
@@ -167,13 +159,12 @@ public class AdventurerService {
     }
 
     /**
-     * Déduis la prochaine {@link Position} de l'aventurier {@link Adventurer} en fonction de son orientation actuelle
-     * et de son {@link Movement} à effectuer.
+     * Déduit la prochaine {@link Position} de l'aventurier {@link Adventurer} en fonction de son orientation actuelle.
      *
      * @param adventurer : l'aventurier concerné.
      * @return : la prochaine position de l'aventurier
      */
-    private  Position getNextAdventurerPosition(Adventurer adventurer) {
+    private Position getNextAdventurerPosition(Adventurer adventurer) {
         Position currentAdventurerPosition = adventurer.getPosition();
         Position nextPosition = new Position();
 
@@ -198,48 +189,50 @@ public class AdventurerService {
         return nextPosition;
     }
 
-    private  boolean isNextPositionOutOfBounds(Position nextPosition, TreasureMap treasureMap) {
-        return nextPosition.getHorizontalPosition() >= treasureMap.getRowCount()
-                || nextPosition.getVerticalPosition() >= treasureMap.getColumnCount();
+    private boolean isNextPositionOutOfBounds(Position nextPosition, TreasureMap treasureMap) {
+        return nextPosition.getHorizontalPosition() >= treasureMap.getColumnCount()
+                || nextPosition.getVerticalPosition() >= treasureMap.getRowCount();
     }
 
-    private  boolean isNextPositionOnMoutain(Position nextPosition, TreasureMapCell[][] treasureMapCells) {
-        return treasureMapCells[nextPosition.getVerticalPosition()][nextPosition.getHorizontalPosition()]
+    private boolean isNextPositionOnMoutain(Position nextPosition, TreasureMapCell[][] treasureMapCells) {
+        return treasureMapCells[nextPosition.getHorizontalPosition()][nextPosition.getVerticalPosition()]
                 .getMountain() != null;
     }
 
-    private  boolean isNextPositionOnAdventurer(Position nextPosition, TreasureMapCell[][] treasureMapCells) {
-        return treasureMapCells[nextPosition.getVerticalPosition()][nextPosition.getHorizontalPosition()]
+    private boolean isNextPositionOnAdventurer(Position nextPosition, TreasureMapCell[][] treasureMapCells) {
+        return treasureMapCells[nextPosition.getHorizontalPosition()][nextPosition.getVerticalPosition()]
                 .getAdventurer() != null;
     }
 
-    private  boolean isNextPositionOnTreasure(Position nextPosition, TreasureMapCell[][] treasureMapCells) {
-        return treasureMapCells[nextPosition.getVerticalPosition()][nextPosition.getHorizontalPosition()]
+    private boolean isNextPositionOnTreasure(Position nextPosition, TreasureMapCell[][] treasureMapCells) {
+        return treasureMapCells[nextPosition.getHorizontalPosition()][nextPosition.getVerticalPosition()]
                 .getTreasure() != null;
 
     }
 
-    private  boolean isNextPositionUnreachable(Position position, TreasureMap treasureMap) {
+    private boolean isNextPositionUnreachable(Position position, TreasureMap treasureMap) {
         return isNextPositionOutOfBounds(position, treasureMap)
                 || isNextPositionOnMoutain(position, treasureMap.getTreasureMapCells())
                 || isNextPositionOnTreasure(position, treasureMap.getTreasureMapCells())
                 || isNextPositionOnAdventurer(position, treasureMap.getTreasureMapCells());
     }
 
-    private  void logWhenNextPositionIsUnreachable(Adventurer adventurer,
-                                                         Position nextPosition,
-                                                         Movement movement,
-                                                         TreasureMap treasureMap) {
+    private void logWhenNextPositionIsUnreachable(Adventurer adventurer,
+                                                  Position nextPosition,
+                                                  Movement movement,
+                                                  TreasureMap treasureMap) {
 
         if (isNextPositionOutOfBounds(nextPosition, treasureMap)) {
             LOGGER.warn("Hors limites. Le déplacement " + movement.getValue() + " de l'aventurier : "
                     + adventurer.getName() + " est ignoré."
             );
+            return;
         }
         if (isNextPositionOnMoutain(nextPosition, treasureMap.getTreasureMapCells())) {
             LOGGER.warn("Une montagne bloque l'aventurier : " + adventurer.getName() +
                     ". Le déplacement " + movement.getValue() + "est ignoré."
             );
+            return;
         }
         if (isNextPositionOnAdventurer(nextPosition, treasureMap.getTreasureMapCells())) {
             LOGGER.warn("Un autre aventurier bloque l'aventurier : " + adventurer.getName() +
@@ -248,7 +241,7 @@ public class AdventurerService {
         }
     }
 
-    private  Orientation getNextOrientationAfterRightTurn(Orientation orientation) {
+    private Orientation getNextOrientationAfterRightTurn(Orientation orientation) {
         Orientation nextOrientation = orientation;
         switch (orientation) {
             case NORTH -> nextOrientation = Orientation.EAST;
@@ -259,7 +252,7 @@ public class AdventurerService {
         return nextOrientation;
     }
 
-    private  Orientation getNextOrientationAfterLeftTurn(Orientation orientation) {
+    private Orientation getNextOrientationAfterLeftTurn(Orientation orientation) {
         Orientation nextOrientation = orientation;
         switch (orientation) {
             case NORTH -> nextOrientation = Orientation.WEST;

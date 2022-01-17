@@ -2,6 +2,7 @@ package fr.carbon.treasuremap.service;
 
 import fr.carbon.treasuremap.exception.ParseLineException;
 import org.junit.jupiter.api.Test;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Service
 public class InputFileReaderServiceTest {
 
     private final InputFileReaderService inputFileReaderService = new InputFileReaderService();

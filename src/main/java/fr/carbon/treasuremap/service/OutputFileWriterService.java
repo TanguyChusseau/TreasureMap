@@ -3,6 +3,7 @@ package fr.carbon.treasuremap.service;
 import fr.carbon.treasuremap.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,7 +13,8 @@ import java.util.List;
 
 import static fr.carbon.treasuremap.utils.TreasureMapGameUtils.*;
 
-public final class OutputFileWriterService {
+@Service
+public class OutputFileWriterService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OutputFileWriterService.class);
 
@@ -34,6 +36,7 @@ public final class OutputFileWriterService {
         List<Adventurer> adventurers = new ArrayList<>();
 
         getTreasureMapContent(treasureMap, mountains, treasures, adventurers);
+        System.out.println(adventurers);
 
         for (Mountain mountain : mountains) {
             formatAndAddMountainLine(lines, mountain);

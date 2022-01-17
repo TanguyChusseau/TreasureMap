@@ -124,25 +124,35 @@ public class TreasureMapServiceTest {
     }
 
     @Test
+    public void should_return_true_when_position_is_out_of_bounds() {
+        //Given
+        TreasureMap treasureMap = new TreasureMap(2, 2, new TreasureMapCell[2][2]);
+        Position position = new Position(2, 2);
+
+        //When - Then
+        assertTrue(treasureMapService.isPositionOutOfBounds(position, treasureMap));
+    }
+
+    @Test
     public void should_return_true_when_position_is_null() {
         //Given
         TreasureMapCell[][] treasureMapCells = new TreasureMapCell[1][1];
-        Position testPosition = new Position(0, 0);
+        Position position = new Position(0, 0);
 
         //When - Then
-        assertTrue(treasureMapService.isPositionNullOrEmptyTakenOnTreasureMap(testPosition, treasureMapCells));
+        assertTrue(treasureMapService.isPositionNullOrEmptyTakenOnTreasureMap(position, treasureMapCells));
     }
 
     @Test
     public void should_return_true_when_position_is_taken() {
         //Given,
         TreasureMapCell[][] treasureMapCells = new TreasureMapCell[1][1];
-        Position testPosition = new Position(0, 0);
+        Position position = new Position(0, 0);
         treasureMapCells[0][0] = new TreasureMapCell();
-        treasureMapCells[0][0].setMountain(new Mountain(testPosition));
+        treasureMapCells[0][0].setMountain(new Mountain(position));
 
         //When - Then
-        assertTrue(treasureMapService.isPositionNullOrEmptyTakenOnTreasureMap(testPosition, treasureMapCells));
+        assertTrue(treasureMapService.isPositionNullOrEmptyTakenOnTreasureMap(position, treasureMapCells));
     }
 
     @Test
@@ -151,10 +161,12 @@ public class TreasureMapServiceTest {
         String testLine = "M - 0 - 0";
         TreasureMapCell[][] treasureMapCells = new TreasureMapCell[1][1];
         treasureMapCells[0][0] = new TreasureMapCell();
+        TreasureMap treasureMap = new TreasureMap(1, 1, treasureMapCells);
+
         Mountain testMountain = new Mountain(new Position(0, 0));
 
         //When
-        treasureMapService.putMountainOnTreasureMapCell(testLine, treasureMapCells);
+        treasureMapService.putMountainOnTreasureMapCell(testLine, treasureMap, treasureMapCells);
         Mountain createdMountain = treasureMapCells[0][0].getMountain();
 
         //Then
@@ -167,17 +179,37 @@ public class TreasureMapServiceTest {
     }
 
     @Test
-    public void should_not_put_mountain_on_treasure_map_when_position_is_taken() throws ParseMountainLineException {
+    public void should_not_put_mountain_on_treasure_map_when_position_is_out_of_bounds() throws ParseMountainLineException {
         //Given
-        String testLine = "M - 0 - 0";
+        String testLine = "M - 1 - 1";
         TreasureMapCell[][] treasureMapCells = new TreasureMapCell[1][1];
         TreasureMapCell testTreasureMapCell = new TreasureMapCell();
+        TreasureMap treasureMap = new TreasureMap(1, 1, treasureMapCells);
         Treasure testTreasure = new Treasure(new Position(0, 0), 0);
         testTreasureMapCell.setTreasure(testTreasure);
         treasureMapCells[0][0] = testTreasureMapCell;
 
         //When
-        treasureMapService.putMountainOnTreasureMapCell(testLine, treasureMapCells);
+        treasureMapService.putMountainOnTreasureMapCell(testLine, treasureMap, treasureMapCells);
+        Mountain createdMountain = treasureMapCells[0][0].getMountain();
+
+        //Then
+        assertNull(createdMountain);
+    }
+
+    @Test
+    public void should_not_put_mountain_on_treasure_map_when_position_is_taken() throws ParseMountainLineException {
+        //Given
+        String testLine = "M - 0 - 0";
+        TreasureMapCell[][] treasureMapCells = new TreasureMapCell[1][1];
+        TreasureMapCell testTreasureMapCell = new TreasureMapCell();
+        TreasureMap treasureMap = new TreasureMap(1, 1, treasureMapCells);
+        Treasure testTreasure = new Treasure(new Position(0, 0), 0);
+        testTreasureMapCell.setTreasure(testTreasure);
+        treasureMapCells[0][0] = testTreasureMapCell;
+
+        //When
+        treasureMapService.putMountainOnTreasureMapCell(testLine, treasureMap, treasureMapCells);
         Mountain createdMountain = treasureMapCells[0][0].getMountain();
 
         //Then
@@ -190,10 +222,12 @@ public class TreasureMapServiceTest {
         String testLine = "T - 0 - 0 - 0";
         TreasureMapCell[][] treasureMapCells = new TreasureMapCell[1][1];
         treasureMapCells[0][0] = new TreasureMapCell();
+        TreasureMap treasureMap = new TreasureMap(1, 1, treasureMapCells);
+
         Treasure testTreasure = new Treasure(new Position(0, 0), 0);
 
         //When
-        treasureMapService.putTreasureOnTreasureMapCell(testLine, treasureMapCells);
+        treasureMapService.putTreasureOnTreasureMapCell(testLine, treasureMap, treasureMapCells);
         Treasure createdTreasure = treasureMapCells[0][0].getTreasure();
 
         //Then
@@ -207,17 +241,37 @@ public class TreasureMapServiceTest {
     }
 
     @Test
-    public void should_not_put_treasure_on_treasure_map_when_position_is_taken() throws ParseTreasureLineException {
+    public void should_not_put_treasure_on_treasure_map_when_position_is_out_of_bounds() throws ParseTreasureLineException {
         //Given
-        String testLine = "T - 0 - 0 - 0";
+        String testLine = "T - 1 - 1 - 0";
         TreasureMapCell[][] treasureMapCells = new TreasureMapCell[1][1];
         TreasureMapCell testTreasureMapCell = new TreasureMapCell();
+        TreasureMap treasureMap = new TreasureMap(1, 1, treasureMapCells);
         Mountain testMountain = new Mountain(new Position(0, 0));
         testTreasureMapCell.setMountain(testMountain);
         treasureMapCells[0][0] = testTreasureMapCell;
 
         //When
-        treasureMapService.putTreasureOnTreasureMapCell(testLine, treasureMapCells);
+        treasureMapService.putTreasureOnTreasureMapCell(testLine, treasureMap, treasureMapCells);
+        Treasure createdTreasure = treasureMapCells[0][0].getTreasure();
+
+        //Then
+        assertNull(createdTreasure);
+    }
+
+    @Test
+    public void should_not_put_treasure_on_treasure_map_when_position_is_taken() throws ParseTreasureLineException {
+        //Given
+        String testLine = "T - 0 - 0 - 0";
+        TreasureMapCell[][] treasureMapCells = new TreasureMapCell[1][1];
+        TreasureMapCell testTreasureMapCell = new TreasureMapCell();
+        TreasureMap treasureMap = new TreasureMap(1, 1, treasureMapCells);
+        Mountain testMountain = new Mountain(new Position(0, 0));
+        testTreasureMapCell.setMountain(testMountain);
+        treasureMapCells[0][0] = testTreasureMapCell;
+
+        //When
+        treasureMapService.putTreasureOnTreasureMapCell(testLine, treasureMap, treasureMapCells);
         Treasure createdTreasure = treasureMapCells[0][0].getTreasure();
 
         //Then
@@ -230,6 +284,8 @@ public class TreasureMapServiceTest {
         String testLine = "A - Antoine - 0 - 0 - S - ADG - 0";
         TreasureMapCell[][] treasureMapCells = new TreasureMapCell[1][1];
         treasureMapCells[0][0] = new TreasureMapCell();
+        TreasureMap treasureMap = new TreasureMap(1, 1, treasureMapCells);
+
         Adventurer testAdventurer = new Adventurer(
                 "Antoine",
                 new Position(0, 0),
@@ -239,7 +295,7 @@ public class TreasureMapServiceTest {
         );
 
         //When
-        treasureMapService.putAdventurerOnTreasureMapCell(testLine, treasureMapCells);
+        treasureMapService.putAdventurerOnTreasureMapCell(testLine, treasureMap, treasureMapCells);
         Adventurer createdAdventurer = treasureMapCells[0][0].getAdventurer();
 
         //Then
@@ -252,17 +308,37 @@ public class TreasureMapServiceTest {
     }
 
     @Test
-    public void should_not_put_adventurer_on_treasure_map_when_position_is_taken() throws ParseAdventurerLineException {
+    public void should_not_put_adventurer_on_treasure_map_when_position_is_out_of_bounds() throws ParseAdventurerLineException {
         //Given
-        String testLine = "A - Antoine - 0 - 0 - S - ADG - 0";
+        String testLine = "A - Antoine - 1 - 1 - S - ADG - 0";
         TreasureMapCell[][] treasureMapCells = new TreasureMapCell[1][1];
+        TreasureMap treasureMap = new TreasureMap(1, 1, treasureMapCells);
         TreasureMapCell testTreasureMapCell = new TreasureMapCell();
         Mountain testMountain = new Mountain(new Position(0, 0));
         testTreasureMapCell.setMountain(testMountain);
         treasureMapCells[0][0] = testTreasureMapCell;
 
         //When
-        treasureMapService.putAdventurerOnTreasureMapCell(testLine, treasureMapCells);
+        treasureMapService.putAdventurerOnTreasureMapCell(testLine, treasureMap, treasureMapCells);
+        Adventurer createdAdventurer = treasureMapCells[0][0].getAdventurer();
+
+        //Then
+        assertNull(createdAdventurer);
+    }
+
+    @Test
+    public void should_not_put_adventurer_on_treasure_map_when_position_is_taken() throws ParseAdventurerLineException {
+        //Given
+        String testLine = "A - Antoine - 0 - 0 - S - ADG - 0";
+        TreasureMapCell[][] treasureMapCells = new TreasureMapCell[1][1];
+        TreasureMapCell testTreasureMapCell = new TreasureMapCell();
+        TreasureMap treasureMap = new TreasureMap(1, 1, treasureMapCells);
+        Mountain testMountain = new Mountain(new Position(0, 0));
+        testTreasureMapCell.setMountain(testMountain);
+        treasureMapCells[0][0] = testTreasureMapCell;
+
+        //When
+        treasureMapService.putAdventurerOnTreasureMapCell(testLine, treasureMap, treasureMapCells);
         Adventurer createdAdventurer = treasureMapCells[0][0].getAdventurer();
 
         //Then
